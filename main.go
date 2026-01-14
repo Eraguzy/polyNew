@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	httpmanager "github.com/Eraguzy/PolyNew/httpManager"
 )
 
 func main() {
 	mux := http.NewServeMux()
-	mux = TestRoutes(mux)
+	mux = httpmanager.TestRoutes(mux)
 
 	fmt.Println("starting server on :3010")
 

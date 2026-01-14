@@ -1,4 +1,4 @@
-package main
+package httpmanager
 
 import "net/http"
 
