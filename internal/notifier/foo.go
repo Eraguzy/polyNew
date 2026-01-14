@@ -1,3 +1,0 @@
-package notifier
-
-// logique metier
