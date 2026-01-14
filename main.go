@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	httpmanager "github.com/Eraguzy/PolyNew/httpManager"
+	httpmanager "github.com/Eraguzy/PolyNew/httpmanager"
 )
 
 func main() {
