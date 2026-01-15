@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func GetRoot(w http.ResponseWriter, r *http.Request) {
+func HandlerGetRoot(w http.ResponseWriter, r *http.Request) {
 	hasFirst := r.URL.Query().Has("first")
 	first := r.URL.Query().Get("first")
 	hasSecond := r.URL.Query().Has("second")
@@ -15,9 +15,8 @@ func GetRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("got / request. first(%t)=%s, second(%t)=%s\n",
 		hasFirst, first,
 		hasSecond, second)
-	io.WriteString(w, "This is my website!\n")
+	io.WriteString(w, "Server is up\n")
 }
-func GetHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got /hello request\n")
-	io.WriteString(w, "Hello, HTTP!\n")
+func HandlerGetHello(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "/hello received\n")
 }
