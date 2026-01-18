@@ -18,7 +18,7 @@ type TableSport struct {
 }
 
 func (t TableSport) TableName() string {
-	return "tbPolymarketSport"
+	return "tbPolymarketSports"
 }
 
 func (db DBManager) UpdateSport(ctx context.Context, tableSport TableSport) error {

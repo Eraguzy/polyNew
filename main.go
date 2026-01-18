@@ -7,15 +7,25 @@ import (
 	"os"
 
 	"github.com/Eraguzy/PolyNew/httpmanager"
+	"github.com/Eraguzy/PolyNew/internal/storage"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load() // Load .env file
+
+	_, err := storage.ConnectToDB() // open db connection
+	if err != nil {
+		fmt.Printf("error connecting to db: %s\n", err)
+		os.Exit(1)
+	}
+
 	mux := http.NewServeMux()
 	mux = httpmanager.TestRoutes(mux)
 
 	fmt.Println("starting server on :3010")
 
-	err := http.ListenAndServe(":3010", mux)
+	err = http.ListenAndServe(":3010", mux)
 	if errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
 	} else if err != nil {
@@ -61,12 +71,11 @@ func main() {
 // 		log.Fatalf("Unable to create connection pool: %v\n", err)
 // 	}
 // 	defer dbpool.Close()
+// 	db := storage.DBManager{Pool: dbpool} // cast to local type
+// 	ctx := context.Background()
 
-// 	var greeting string
-// 	err = dbpool.QueryRow(context.Background(), "select 'Hello, db!'").Scan(&greeting)
+// 	err = actions.UpdateSports(ctx, db)
 // 	if err != nil {
-// 		log.Fatalf("QueryRow failed: %v\n", err)
+// 		log.Fatalf("error updating sports: %v\n", err)
 // 	}
-
-// 	fmt.Println(greeting)
 // }

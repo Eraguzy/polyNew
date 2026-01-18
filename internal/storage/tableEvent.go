@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -13,10 +14,10 @@ import (
 // we compare the state of this table to the TableEventMarket to see
 // if there are new markets
 type TableEvent struct {
-	EventID   int     `db:"eventID"`
-	CreatedAt int     `db:"createdAt"`
-	Ticker    string  `db:"ticker"`
-	ImageURL  *string `db:"imageURL"`
+	EventID   int       `db:"eventID"`
+	CreatedAt time.Time `db:"createdAt"`
+	Ticker    string    `db:"ticker"`
+	ImageURL  *string   `db:"imageURL"`
 }
 
 func (t TableEvent) TableName() string {

@@ -1,8 +1,12 @@
 package polymarket
 
-import "time"
+import (
+	"time"
 
-type Sports struct {
+	"github.com/Eraguzy/PolyNew/internal/storage"
+)
+
+type Sport struct {
 	ID         int       `json:"id"`
 	Sport      string    `json:"sport"`
 	Image      string    `json:"image"`
@@ -13,9 +17,18 @@ type Sports struct {
 	CreatedAt  time.Time `json:"createdAt"`
 }
 
+func (s Sport) ToTableSport() storage.TableSport {
+	return storage.TableSport{
+		SportID:   s.ID,
+		Sport:     s.Sport,
+		CreatedAt: s.CreatedAt,
+		Tracked:   false, // default to false, can be updated later
+	}
+}
+
 // Market represents a market payload (see test.json -> "type Market struct").
 type Market struct {
-	ID                           string        `json:"id"`
+	ID                           int           `json:"id"`
 	Question                     string        `json:"question"`
 	ConditionID                  string        `json:"conditionId"`
 	Slug                         string        `json:"slug"`
@@ -90,7 +103,7 @@ type Market struct {
 
 // MarketEvent represents the event object inside a Market.
 type MarketEvent struct {
-	ID                  string    `json:"id"`
+	ID                  int       `json:"id"`
 	Ticker              string    `json:"ticker"`
 	Slug                string    `json:"slug"`
 	Title               string    `json:"title"`
@@ -134,7 +147,7 @@ type MarketEvent struct {
 
 // Event represents an event payload (see test.json -> "type Event struct").
 type Event struct {
-	ID                  string        `json:"id"`
+	ID                  int           `json:"id"`
 	Ticker              string        `json:"ticker"`
 	Slug                string        `json:"slug"`
 	Title               string        `json:"title"`
@@ -182,9 +195,18 @@ type Event struct {
 	RequiresTranslation bool          `json:"requiresTranslation"`
 }
 
+func (e Event) ToTableEvent() storage.TableEvent {
+	return storage.TableEvent{
+		EventID:   e.ID,
+		CreatedAt: e.CreatedAt,
+		Ticker:    e.Ticker,
+		ImageURL:  &e.Image,
+	}
+}
+
 // EventMarket represents a market object inside an Event.
 type EventMarket struct {
-	ID                           string    `json:"id"`
+	ID                           int       `json:"id"`
 	Question                     string    `json:"question"`
 	ConditionID                  string    `json:"conditionId"`
 	Slug                         string    `json:"slug"`
@@ -266,8 +288,17 @@ type EventMarket struct {
 	RequiresTranslation          bool      `json:"requiresTranslation"`
 }
 
+func (em EventMarket) ToTableEventMarket(eventID int) storage.TableEventMarket {
+	return storage.TableEventMarket{
+		EventMarketID: em.ID,
+		EventID:       eventID,
+		Question:      em.Question,
+		ImageURL:      &em.Image,
+	}
+}
+
 type EventSeries struct {
-	ID                  string    `json:"id"`
+	ID                  int       `json:"id"`
 	Ticker              string    `json:"ticker"`
 	Slug                string    `json:"slug"`
 	Title               string    `json:"title"`
@@ -296,7 +327,7 @@ type EventSeries struct {
 }
 
 type EventTag struct {
-	ID                  string    `json:"id"`
+	ID                  int       `json:"id"`
 	Label               string    `json:"label"`
 	Slug                string    `json:"slug"`
 	ForceShow           bool      `json:"forceShow"`
