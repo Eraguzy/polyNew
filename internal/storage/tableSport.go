@@ -119,7 +119,7 @@ func (db DBManager) GetTableSports(ctx context.Context, sportid *int, sport *str
 
 func (db DBManager) DeleteSport(ctx context.Context, sportID int) error {
 	req := fmt.Sprintf(`
-	DELETE FROM tbPolymarketSport 
+	DELETE FROM %s 
 	WHERE sportID = @sportID`, TableSport{}.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
