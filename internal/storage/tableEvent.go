@@ -10,3 +10,7 @@ type TableEvent struct {
 	Ticker    string  `db:"ticker"`
 	ImageURL  *string `db:"imageURL"`
 }
+
+func (t TableEvent) TableName() string {
+	return "tbPolymarketEvents"
+}

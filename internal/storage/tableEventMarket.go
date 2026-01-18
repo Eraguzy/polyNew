@@ -8,3 +8,7 @@ type TableEventMarket struct {
 	Question      string  `db:"question"`
 	ImageURL      *string `db:"imageURL"`
 }
+
+func (t TableEventMarket) TableName() string {
+	return "tbPolymarketEventMarket"
+}
