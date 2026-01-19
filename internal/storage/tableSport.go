@@ -38,6 +38,19 @@ func (db DBManager) UpdateSport(ctx context.Context, tableSport TableSport) erro
 	return err
 }
 
+func (db DBManager) SetTrackedSport(ctx context.Context, sportID int, tracked bool) error {
+	req := fmt.Sprintf(`
+        UPDATE %s
+        SET tracked = @tracked 
+		WHERE sportID = @sportID`, TableSport{}.TableName())
+
+	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
+		"sportID": sportID,
+		"tracked": tracked,
+	})
+	return err
+}
+
 func (db DBManager) InsertSport(ctx context.Context, tableSport TableSport) error {
 	req := fmt.Sprintf(`INSERT INTO %s 
 	(sportID, sport, createdAt, tracked) VALUES 

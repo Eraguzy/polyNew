@@ -12,7 +12,7 @@ import (
 
 // retrieve and store all sports from polymarket
 // (will fail if id already exists)
-func UpdateSports(ctx context.Context, db storage.DBManager) error {
+func InsertAllSports(ctx context.Context, db storage.DBManager) error {
 	body, err := polymarket.SendGetRequest(
 		polymarket.URLGammaAPI,
 		polymarket.PathSports,

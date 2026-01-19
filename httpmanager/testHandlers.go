@@ -12,10 +12,11 @@ func HandlerGetRoot(w http.ResponseWriter, r *http.Request) {
 	hasSecond := r.URL.Query().Has("second")
 	second := r.URL.Query().Get("second")
 
-	fmt.Printf("got / request. first(%t)=%s, second(%t)=%s\n",
+	io.WriteString(w, "Server is up. To test arguments, try to pass 'first' and 'second' through the URL\n")
+	io.WriteString(w, fmt.Sprintf("first(%t)=%s, second(%t)=%s\n",
 		hasFirst, first,
-		hasSecond, second)
-	io.WriteString(w, "Server is up\n")
+		hasSecond, second,
+	))
 }
 func HandlerGetHello(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "/hello received\n")

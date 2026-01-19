@@ -14,7 +14,7 @@ import (
 func main() {
 	godotenv.Load() // Load .env file
 
-	_, err := storage.ConnectToDB() // open db connection
+	db, err := storage.ConnectToDB() // open db connection
 	if err != nil {
 		fmt.Printf("error connecting to db: %s\n", err)
 		os.Exit(1)
@@ -22,6 +22,11 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux = httpmanager.TestRoutes(mux)
+	mux = httpmanager.UpdaterRoutes(
+		mux,
+		httpmanager.DBHandler{
+			Db: storage.DBManager{Pool: db},
+		})
 
 	fmt.Println("starting server on :3010")
 
