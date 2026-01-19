@@ -1,39 +1,89 @@
-// unusual updates to potentially perform manually
 package actions
 
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"io"
+	"strconv"
 
 	"github.com/Eraguzy/PolyNew/internal/storage"
 	"github.com/Eraguzy/PolyNew/messager/polymarket"
 )
 
-// retrieve and store all sports from polymarket
-// (will fail if id already exists)
-func InsertAllSports(ctx context.Context, db storage.DBManager) error {
+// if found in polymarket's api, insert/update in db
+func FetchAndStoreTags(ctx context.Context, db storage.DBManager, slug string) error {
 	body, err := polymarket.SendGetRequest(
 		polymarket.URLGammaAPI,
-		polymarket.PathSports,
+		polymarket.PathTagsSlug(slug),
 		nil,
 	)
 	if err != nil {
-		log.Fatalf("error sending get request: %v\n", err)
+		return err
 	}
 
-	sports, storageSports := []polymarket.Sport{}, []storage.TableSport{}
-	err = json.Unmarshal(body, &sports)
+	tag := polymarket.Tag{}
+	err = json.Unmarshal(body, &tag)
 	if err != nil {
-		log.Fatalf("error unmarshaling sports: %v\n", err)
+		return err
 	}
-	for _, sport := range sports {
-		storageSports = append(storageSports, sport.ToTableSport())
+	tabletag, err := tag.ToTableTag()
+	if err != nil {
+		return err
 	}
 
-	err = db.BulkInsertSport(ctx, storageSports)
+	err = db.InsertTag(ctx, tabletag)
 	if err != nil {
-		log.Fatalf("error bulk inserting sports: %v\n", err)
+		return err
 	}
+
+	io.WriteString(io.Discard, "Inserted tag "+slug+"\n")
+	return nil
+}
+
+func CompareEvents(ctx context.Context, db storage.DBManager) error {
+	// might add parameters e.g. eventid, tagids, etc later
+	// get all tracked tags from db
+	tableTags, err := db.GetTrackedTags(ctx)
+	if err != nil {
+		return err
+	}
+	seriesIDs := []int{}
+	for _, tag := range tableTags {
+		seriesIDs = append(seriesIDs, tag.TagID)
+	}
+
+	// get events from polymarket
+	for _, serieID := range seriesIDs {
+		args := []polymarket.GetArgs{
+			{Param: polymarket.URLParamActive, Value: "true"},
+			{Param: polymarket.URLParamClosed, Value: "false"},
+			{Param: polymarket.URLParamLimit, Value: "500"},
+			{Param: polymarket.URLParamSeriesID, Value: strconv.Itoa(serieID)},
+			// {Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
+		}
+		body, err := polymarket.SendGetRequest(
+			polymarket.URLGammaAPI,
+			polymarket.PathEvents,
+			args,
+		)
+		if err != nil {
+			return err
+		}
+
+		events := []polymarket.Event{}
+		err = json.Unmarshal(body, &events)
+		if err != nil {
+			return err
+		}
+	}
+
+	// compare to events in db
+
+	// update db accordingly
+	// add event if missing
+	// if present in db but not in polymarket, remove it
+
+	// notify telegram
+
 	return nil
 }

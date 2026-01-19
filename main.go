@@ -27,7 +27,6 @@ func main() {
 		httpmanager.DBHandler{
 			Db: storage.DBManager{Pool: db},
 		})
-
 	fmt.Println("starting server on :3010")
 
 	err = http.ListenAndServe(":3010", mux)
@@ -39,48 +38,31 @@ func main() {
 	}
 }
 
-// 	// limit := 500
-// 	// for offset := 0; ; offset += 500 {
-// 	// 	args := []polymarket.GetArgs{
-// 	// 		{Param: polymarket.URLParamActive, Value: "true"},
-// 	// 		{Param: polymarket.URLParamClosed, Value: "false"},
-// 	// 		{Param: polymarket.URLParamLimit, Value: fmt.Sprintf("%d", limit)},
-// 	// 		{Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
-// 	// 	}
+//  limit := 500
+//  for offset := 0; ; offset += 500 {
+//  	args := []polymarket.GetArgs{
+//  		{Param: polymarket.URLParamActive, Value: "true"},
+//  		{Param: polymarket.URLParamClosed, Value: "false"},
+//  		{Param: polymarket.URLParamLimit, Value: fmt.Sprintf("%d", limit)},
+//  		{Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
+//  	}
 
-// 	// 	body, err := polymarket.SendGetRequest(
-// 	// 		polymarket.URLGammaAPI,
-// 	// 		polymarket.PathEvents,
-// 	// 		args,
-// 	// 	)
-// 	// 	if err != nil {
-// 	// 		fmt.Println("error:", err)
-// 	// 		break
-// 	// 	}
+//  	body, err := polymarket.SendGetRequest(
+//  		polymarket.URLGammaAPI,
+//  		polymarket.PathEvents,
+//  		args,
+//  	)
+//  	if err != nil {
+//  		fmt.Println("error:", err)
+//  		break
+//  	}
 
-// 	// 	fmt.Println(string(body))
-// 	// 	fmt.Println("offset:", offset)
+//  	fmt.Println(string(body))
+//  	fmt.Println("offset:", offset)
 
-// 	// 	if string(body) == "[]" {
-// 	// 		fmt.Println("done")
-// 	// 		break
-// 	// 	}
-// 	// }
-// }
-
-// func main() {
-// 	godotenv.Load() // Load .env file
-
-// 	dbpool, err := storage.ConnectToDB()
-// 	if err != nil {
-// 		log.Fatalf("Unable to create connection pool: %v\n", err)
-// 	}
-// 	defer dbpool.Close()
-// 	db := storage.DBManager{Pool: dbpool} // cast to local type
-// 	ctx := context.Background()
-
-// 	err = actions.UpdateSports(ctx, db)
-// 	if err != nil {
-// 		log.Fatalf("error updating sports: %v\n", err)
-// 	}
-// }
+//  	if string(body) == "[]" {
+//  		fmt.Println("done")
+//  		break
+//  	}
+//  }
+//

@@ -1,29 +1,33 @@
 package polymarket
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/Eraguzy/PolyNew/internal/storage"
 )
 
-type Sport struct {
-	ID         int       `json:"id"`
-	Sport      string    `json:"sport"`
-	Image      string    `json:"image"`
-	Resolution string    `json:"resolution"`
-	Ordering   string    `json:"ordering"`
-	Tags       string    `json:"tags"`
-	Series     string    `json:"series"`
-	CreatedAt  time.Time `json:"createdAt"`
+type Tag struct {
+	ID                  string    `json:"id"`
+	Label               string    `json:"label"`
+	Slug                string    `json:"slug"`
+	ForceShow           bool      `json:"forceShow"`
+	PublishedAt         string    `json:"publishedAt"`
+	CreatedAt           time.Time `json:"createdAt"`
+	UpdatedAt           time.Time `json:"updatedAt"`
+	RequiresTranslation bool      `json:"requiresTranslation"`
 }
 
-func (s Sport) ToTableSport() storage.TableSport {
-	return storage.TableSport{
-		SportID:   s.ID,
-		Sport:     s.Sport,
-		CreatedAt: s.CreatedAt,
-		Tracked:   false, // default to false, can be updated later
+func (s Tag) ToTableTag() (storage.TableTags, error) {
+	strid, err := strconv.Atoi(s.ID)
+	if err != nil {
+		return storage.TableTags{}, err
 	}
+	return storage.TableTags{
+		TagID:   strid,
+		Name:    s.Label,
+		Tracked: true, // default to false, can be updated later
+	}, nil
 }
 
 // Market represents a market payload (see test.json -> "type Market struct").

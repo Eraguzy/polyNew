@@ -19,12 +19,18 @@ const (
 	PathTags   URLPath = "/tags"
 )
 
+func PathTagsSlug(slug string) URLPath {
+	return URLPath("/tags/slug/" + slug)
+}
+
 // url parameters
 type URLParam string
 
 const (
-	URLParamActive URLParam = "active"
-	URLParamClosed URLParam = "closed"
-	URLParamLimit  URLParam = "limit"
-	URLParamOffset URLParam = "offset"
+	URLParamActive   URLParam = "active"
+	URLParamClosed   URLParam = "closed"
+	URLParamLimit    URLParam = "limit"
+	URLParamOffset   URLParam = "offset"
+	URLParamSeriesID URLParam = "series_id"
+	URLParamSlug     URLParam = "slug"
 )

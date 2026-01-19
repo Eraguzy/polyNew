@@ -21,16 +21,16 @@ type TableEvent struct {
 }
 
 func (t TableEvent) TableName() string {
-	return "tbPolymarketEvents"
+	return `"tbPolymarketEvents"`
 }
 
 func (db DBManager) UpdateEvent(ctx context.Context, tableEvent TableEvent) error {
 	req := fmt.Sprintf(`
         UPDATE %s
-        SET createdAt = @createdAt, 
+        SET "createdAt" = @createdAt, 
             ticker = @ticker,
-            imageURL = @imageURL
-		WHERE eventID = @eventID`, tableEvent.TableName())
+            "imageURL" = @imageURL
+		WHERE "eventID" = @eventID`, tableEvent.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"eventID":   tableEvent.EventID,
@@ -43,7 +43,7 @@ func (db DBManager) UpdateEvent(ctx context.Context, tableEvent TableEvent) erro
 
 func (db DBManager) InsertEvent(ctx context.Context, tableEvent TableEvent) error {
 	req := fmt.Sprintf(`INSERT INTO %s 
-	(eventID, createdAt, ticker, imageURL) VALUES 
+	("eventID", "createdAt", ticker, "imageURL") VALUES 
 	(@eventID, @createdAt, @ticker, @imageURL)`, tableEvent.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
@@ -87,7 +87,7 @@ func (db DBManager) GetTableEvents(ctx context.Context, eventid *int, ticker *st
 
 	if eventid != nil {
 		args = append(args, *eventid)
-		conditions = append(conditions, fmt.Sprintf("eventID = $%d", len(args)))
+		conditions = append(conditions, fmt.Sprintf(`"eventID" = $%d`, len(args)))
 	}
 	if ticker != nil {
 		args = append(args, *ticker)
@@ -123,7 +123,7 @@ func (db DBManager) GetTableEvents(ctx context.Context, eventid *int, ticker *st
 func (db DBManager) DeleteEvent(ctx context.Context, eventID int) error {
 	req := fmt.Sprintf(`
 	DELETE FROM %s 
-	WHERE eventID = @eventID`, TableEvent{}.TableName())
+	WHERE "eventID" = @eventID`, TableEvent{}.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"eventID": eventID,

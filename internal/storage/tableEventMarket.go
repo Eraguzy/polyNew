@@ -18,16 +18,16 @@ type TableEventMarket struct {
 }
 
 func (t TableEventMarket) TableName() string {
-	return "tbPolymarketEventMarket"
+	return `"tbPolymarketEventMarket"`
 }
 
 func (db DBManager) UpdateEventMarket(ctx context.Context, tableEventMarket TableEventMarket) error {
 	req := fmt.Sprintf(`
         UPDATE %s
-        SET eventID = @eventID, 
+        SET "eventID" = @eventID, 
             question = @question,
             imageURL = @imageURL
-		WHERE eventMarketID = @eventMarketID`, tableEventMarket.TableName())
+		WHERE "eventMarketID" = @eventMarketID`, tableEventMarket.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"eventMarketID": tableEventMarket.EventMarketID,
@@ -40,7 +40,7 @@ func (db DBManager) UpdateEventMarket(ctx context.Context, tableEventMarket Tabl
 
 func (db DBManager) InsertEventMarket(ctx context.Context, tableEventMarket TableEventMarket) error {
 	req := fmt.Sprintf(`INSERT INTO %s 
-	(eventMarketID, eventID, question, imageURL) VALUES 
+	("eventMarketID", "eventID", question, imageURL) VALUES 
 	(@eventMarketID, @eventID, @question, @imageURL)`, tableEventMarket.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
@@ -84,7 +84,7 @@ func (db DBManager) GetTableEventMarkets(ctx context.Context, eventmarketid *int
 
 	if eventmarketid != nil {
 		args = append(args, *eventmarketid)
-		conditions = append(conditions, fmt.Sprintf("eventMarketID = $%d", len(args)))
+		conditions = append(conditions, fmt.Sprintf(`"eventMarketID" = $%d`, len(args)))
 	}
 	if question != nil {
 		args = append(args, *question)
@@ -120,7 +120,7 @@ func (db DBManager) GetTableEventMarkets(ctx context.Context, eventmarketid *int
 func (db DBManager) DeleteEventMarket(ctx context.Context, eventMarketID int) error {
 	req := fmt.Sprintf(`
 	DELETE FROM %s 
-	WHERE eventMarketID = @eventMarketID`, TableEventMarket{}.TableName())
+	WHERE "eventMarketID" = @eventMarketID`, TableEventMarket{}.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"eventMarketID": eventMarketID,
