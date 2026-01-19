@@ -38,11 +38,13 @@ func (db DBHandler) HandlerSetTrackedTag(w http.ResponseWriter, r *http.Request)
 }
 
 func (db DBHandler) HandlerCompareEvents(w http.ResponseWriter, r *http.Request) {
-	err := actions.CompareEvents(r.Context(), db.Db)
+	inserted, deleted, err := actions.CompareEvents(r.Context(), db.Db)
 	if err != nil {
 		io.WriteString(w, fmt.Sprintf("error while comparing events: %v\n", err))
 		return
 	}
+	io.WriteString(w, fmt.Sprintf("Events inserted: %v\n", inserted))
+	io.WriteString(w, fmt.Sprintf("Events deleted: %v\n", deleted))
 }
 
 func (db DBHandler) HandlerFetchStoreTag(w http.ResponseWriter, r *http.Request) {
@@ -55,4 +57,10 @@ func (db DBHandler) HandlerFetchStoreTag(w http.ResponseWriter, r *http.Request)
 		io.WriteString(w, fmt.Sprintf("error during fetching/storing tag: %v\n", err))
 		return
 	}
+	io.WriteString(
+		w,
+		fmt.Sprintf("Tag %s fetched and stored successfully\n",
+			r.URL.Query().Get("slug"),
+		),
+	)
 }

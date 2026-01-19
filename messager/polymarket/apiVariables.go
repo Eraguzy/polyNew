@@ -151,7 +151,7 @@ type MarketEvent struct {
 
 // Event represents an event payload (see test.json -> "type Event struct").
 type Event struct {
-	ID                  int           `json:"id"`
+	ID                  string        `json:"id"`
 	Ticker              string        `json:"ticker"`
 	Slug                string        `json:"slug"`
 	Title               string        `json:"title"`
@@ -176,7 +176,7 @@ type Event struct {
 	PublishedAt         string        `json:"published_at"`
 	CreatedAt           time.Time     `json:"createdAt"`
 	UpdatedAt           time.Time     `json:"updatedAt"`
-	Competitive         int           `json:"competitive"`
+	Competitive         float64       `json:"competitive"`
 	Volume24hr          float64       `json:"volume24hr"`
 	Volume1wk           float64       `json:"volume1wk"`
 	Volume1mo           float64       `json:"volume1mo"`
@@ -199,18 +199,22 @@ type Event struct {
 	RequiresTranslation bool          `json:"requiresTranslation"`
 }
 
-func (e Event) ToTableEvent() storage.TableEvent {
+func (e Event) ToTableEvent() (storage.TableEvent, error) {
+	strid, err := strconv.Atoi(e.ID)
+	if err != nil {
+		return storage.TableEvent{}, err
+	}
 	return storage.TableEvent{
-		EventID:   e.ID,
+		EventID:   strid,
 		CreatedAt: e.CreatedAt,
 		Ticker:    e.Ticker,
 		ImageURL:  &e.Image,
-	}
+	}, nil
 }
 
 // EventMarket represents a market object inside an Event.
 type EventMarket struct {
-	ID                           int       `json:"id"`
+	ID                           string    `json:"id"`
 	Question                     string    `json:"question"`
 	ConditionID                  string    `json:"conditionId"`
 	Slug                         string    `json:"slug"`
@@ -230,7 +234,7 @@ type EventMarket struct {
 	MarketType                   string    `json:"marketType"`
 	Closed                       bool      `json:"closed"`
 	MarketMakerAddress           string    `json:"marketMakerAddress"`
-	UpdatedBy                    int       `json:"updatedBy"`
+	UpdatedBy                    string    `json:"updatedBy"`
 	CreatedAt                    time.Time `json:"createdAt"`
 	UpdatedAt                    time.Time `json:"updatedAt"`
 	ClosedTime                   string    `json:"closedTime"`
@@ -266,7 +270,7 @@ type EventMarket struct {
 	Ready                        bool      `json:"ready"`
 	Funded                       bool      `json:"funded"`
 	Cyom                         bool      `json:"cyom"`
-	Competitive                  int       `json:"competitive"`
+	Competitive                  float64   `json:"competitive"`
 	PagerDutyNotificationEnabled bool      `json:"pagerDutyNotificationEnabled"`
 	Approved                     bool      `json:"approved"`
 	RewardsMinSize               float64   `json:"rewardsMinSize"`
@@ -292,17 +296,21 @@ type EventMarket struct {
 	RequiresTranslation          bool      `json:"requiresTranslation"`
 }
 
-func (em EventMarket) ToTableEventMarket(eventID int) storage.TableEventMarket {
+func (em EventMarket) ToTableEventMarket(eventID int) (storage.TableEventMarket, error) {
+	strid, err := strconv.Atoi(em.ID)
+	if err != nil {
+		return storage.TableEventMarket{}, err
+	}
 	return storage.TableEventMarket{
-		EventMarketID: em.ID,
+		EventMarketID: strid,
 		EventID:       eventID,
 		Question:      em.Question,
 		ImageURL:      &em.Image,
-	}
+	}, nil
 }
 
 type EventSeries struct {
-	ID                  int       `json:"id"`
+	ID                  string    `json:"id"`
 	Ticker              string    `json:"ticker"`
 	Slug                string    `json:"slug"`
 	Title               string    `json:"title"`
@@ -323,7 +331,7 @@ type EventSeries struct {
 	CreatedAt           time.Time `json:"createdAt"`
 	UpdatedAt           time.Time `json:"updatedAt"`
 	CommentsEnabled     bool      `json:"commentsEnabled"`
-	Competitive         string    `json:"competitive"`
+	Competitive         float64   `json:"competitive"`
 	Volume24hr          float64   `json:"volume24hr"`
 	StartDate           time.Time `json:"startDate"`
 	CommentCount        int       `json:"commentCount"`
@@ -331,7 +339,7 @@ type EventSeries struct {
 }
 
 type EventTag struct {
-	ID                  int       `json:"id"`
+	ID                  string    `json:"id"`
 	Label               string    `json:"label"`
 	Slug                string    `json:"slug"`
 	ForceShow           bool      `json:"forceShow"`

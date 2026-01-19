@@ -27,10 +27,10 @@ func PathTagsSlug(slug string) URLPath {
 type URLParam string
 
 const (
-	URLParamActive   URLParam = "active"
-	URLParamClosed   URLParam = "closed"
-	URLParamLimit    URLParam = "limit"
-	URLParamOffset   URLParam = "offset"
-	URLParamSeriesID URLParam = "series_id"
-	URLParamSlug     URLParam = "slug"
+	URLParamActive URLParam = "active"
+	URLParamClosed URLParam = "closed"
+	URLParamLimit  URLParam = "limit"
+	URLParamOffset URLParam = "offset"
+	URLParamTagID  URLParam = "tag_id"
+	URLParamSlug   URLParam = "slug"
 )

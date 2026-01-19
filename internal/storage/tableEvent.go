@@ -24,6 +24,10 @@ func (t TableEvent) TableName() string {
 	return `"tbPolymarketEvents"`
 }
 
+func (t TableEvent) TableNameIdentifier() string {
+	return "tbPolymarketEvents"
+}
+
 func (db DBManager) UpdateEvent(ctx context.Context, tableEvent TableEvent) error {
 	req := fmt.Sprintf(`
         UPDATE %s
@@ -55,12 +59,12 @@ func (db DBManager) InsertEvent(ctx context.Context, tableEvent TableEvent) erro
 	return err
 }
 
-func (db DBManager) BulkInsertEvent(ctx context.Context, tableEvents []TableEvent) error {
+func (db DBManager) BulkInsertEvents(ctx context.Context, tableEvents []TableEvent) error {
 	columns := []string{"eventID", "createdAt", "ticker", "imageURL"}
 
 	_, err := db.Pool.CopyFrom(
 		ctx,
-		pgx.Identifier{TableEvent{}.TableName()},
+		pgx.Identifier{TableEvent{}.TableNameIdentifier()},
 		columns,
 		pgx.CopyFromSlice(len(tableEvents), func(i int) ([]any, error) {
 			return []any{

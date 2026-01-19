@@ -19,6 +19,10 @@ func (t TableTags) TableName() string {
 	return `"tbPolymarketTags"`
 }
 
+func (t TableTags) TableNameIdentifier() string {
+	return "tbPolymarketTags"
+}
+
 func (db DBManager) UpdateTag(ctx context.Context, tableTag TableTags) error {
 	req := fmt.Sprintf(`
         UPDATE %s
@@ -65,7 +69,7 @@ func (db DBManager) BulkInsertTags(ctx context.Context, tableTags []TableTags) e
 
 	_, err := db.Pool.CopyFrom(
 		ctx,
-		pgx.Identifier{TableTags{}.TableName()},
+		pgx.Identifier{TableTags{}.TableNameIdentifier()},
 		columns,
 		pgx.CopyFromSlice(len(tableTags), func(i int) ([]any, error) {
 			return []any{

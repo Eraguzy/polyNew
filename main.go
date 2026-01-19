@@ -33,7 +33,7 @@ func main() {
 	if errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
 	} else if err != nil {
-		fmt.Printf("error starting server: %s\n", err)
+		fmt.Printf("error when starting server: %s\n", err)
 		os.Exit(1)
 	}
 }

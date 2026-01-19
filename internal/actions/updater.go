@@ -3,7 +3,6 @@ package actions
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"strconv"
 
 	"github.com/Eraguzy/PolyNew/internal/storage"
@@ -36,30 +35,31 @@ func FetchAndStoreTags(ctx context.Context, db storage.DBManager, slug string) e
 		return err
 	}
 
-	io.WriteString(io.Discard, "Inserted tag "+slug+"\n")
 	return nil
 }
 
-func CompareEvents(ctx context.Context, db storage.DBManager) error {
+// compares events from polymarket API to those in our db. Inserts new events, deletes closed/nonexistent events
+func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []int, deleted []int, err error) {
 	// might add parameters e.g. eventid, tagids, etc later
 	// get all tracked tags from db
 	tableTags, err := db.GetTrackedTags(ctx)
 	if err != nil {
-		return err
-	}
-	seriesIDs := []int{}
-	for _, tag := range tableTags {
-		seriesIDs = append(seriesIDs, tag.TagID)
+		return nil, nil, err
 	}
 
 	// get events from polymarket
-	for _, serieID := range seriesIDs {
+	apiEvents := []storage.TableEvent{}
+	for _, tag := range tableTags {
+		if !tag.Tracked {
+			continue
+		}
+
 		args := []polymarket.GetArgs{
 			{Param: polymarket.URLParamActive, Value: "true"},
 			{Param: polymarket.URLParamClosed, Value: "false"},
 			{Param: polymarket.URLParamLimit, Value: "500"},
-			{Param: polymarket.URLParamSeriesID, Value: strconv.Itoa(serieID)},
-			// {Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
+			{Param: polymarket.URLParamTagID, Value: strconv.Itoa(tag.TagID)},
+			// {Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)}, // required if api response is too long
 		}
 		body, err := polymarket.SendGetRequest(
 			polymarket.URLGammaAPI,
@@ -67,23 +67,66 @@ func CompareEvents(ctx context.Context, db storage.DBManager) error {
 			args,
 		)
 		if err != nil {
-			return err
+			return nil, nil, err
 		}
 
 		events := []polymarket.Event{}
 		err = json.Unmarshal(body, &events)
 		if err != nil {
-			return err
+			return nil, nil, err
+		}
+		for _, event := range events {
+			tableEvent, err := event.ToTableEvent()
+			if err != nil {
+				return nil, nil, err
+			}
+			apiEvents = append(apiEvents, tableEvent)
 		}
 	}
 
 	// compare to events in db
+	// insert if missing
+	eventsInDb, err := db.GetTableEvents(ctx, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	notInDb := []storage.TableEvent{}
+	for _, apiEvent := range apiEvents {
+		found := false
+		for _, dbEvent := range eventsInDb {
+			if apiEvent.EventID == dbEvent.EventID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			inserted = append(inserted, apiEvent.EventID)
+			notInDb = append(notInDb, apiEvent)
+		}
+	}
+	err = db.BulkInsertEvents(ctx, notInDb)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	// update db accordingly
-	// add event if missing
-	// if present in db but not in polymarket, remove it
+	// remove if not present in polymarket anymore
+	for _, dbEvent := range eventsInDb {
+		found := false
+		for _, apiEvent := range apiEvents {
+			if apiEvent.EventID == dbEvent.EventID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			deleted = append(deleted, dbEvent.EventID)
+			err = db.DeleteEvent(ctx, dbEvent.EventID)
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+	}
 
-	// notify telegram
-
-	return nil
+	// notify telegram (TODO)
+	return inserted, deleted, nil
 }
