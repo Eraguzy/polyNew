@@ -209,6 +209,7 @@ func (e Event) ToTableEvent() (storage.TableEvent, error) {
 		CreatedAt: e.CreatedAt,
 		Ticker:    e.Ticker,
 		ImageURL:  &e.Image,
+		Title:     &e.Title,
 	}, nil
 }
 
