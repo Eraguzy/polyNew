@@ -18,6 +18,7 @@ type TableEvent struct {
 	CreatedAt time.Time `db:"createdAt"`
 	Ticker    string    `db:"ticker"`
 	ImageURL  *string   `db:"imageURL"`
+	Title     *string   `db:"title"`
 }
 
 func (t TableEvent) TableName() string {
@@ -33,7 +34,8 @@ func (db DBManager) UpdateEvent(ctx context.Context, tableEvent TableEvent) erro
         UPDATE %s
         SET "createdAt" = @createdAt, 
             ticker = @ticker,
-            "imageURL" = @imageURL
+		    "imageURL" = @imageURL,
+            title = @title
 		WHERE "eventID" = @eventID`, tableEvent.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
@@ -41,26 +43,28 @@ func (db DBManager) UpdateEvent(ctx context.Context, tableEvent TableEvent) erro
 		"createdAt": tableEvent.CreatedAt,
 		"ticker":    tableEvent.Ticker,
 		"imageURL":  tableEvent.ImageURL,
+		"title":     tableEvent.Title,
 	})
 	return err
 }
 
 func (db DBManager) InsertEvent(ctx context.Context, tableEvent TableEvent) error {
 	req := fmt.Sprintf(`INSERT INTO %s 
-	("eventID", "createdAt", ticker, "imageURL") VALUES 
-	(@eventID, @createdAt, @ticker, @imageURL)`, tableEvent.TableName())
+	("eventID", "createdAt", ticker, "imageURL", title) VALUES 
+	(@eventID, @createdAt, @ticker, @imageURL, @title)`, tableEvent.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"eventID":   tableEvent.EventID,
 		"createdAt": tableEvent.CreatedAt,
 		"ticker":    tableEvent.Ticker,
 		"imageURL":  tableEvent.ImageURL,
+		"title":     tableEvent.Title,
 	})
 	return err
 }
 
 func (db DBManager) BulkInsertEvents(ctx context.Context, tableEvents []TableEvent) error {
-	columns := []string{"eventID", "createdAt", "ticker", "imageURL"}
+	columns := []string{"eventID", "createdAt", "ticker", "imageURL", "title"}
 
 	_, err := db.Pool.CopyFrom(
 		ctx,
@@ -72,6 +76,7 @@ func (db DBManager) BulkInsertEvents(ctx context.Context, tableEvents []TableEve
 				tableEvents[i].CreatedAt,
 				tableEvents[i].Ticker,
 				tableEvents[i].ImageURL,
+				tableEvents[i].Title,
 			}, nil
 		}),
 	)
@@ -115,6 +120,7 @@ func (db DBManager) GetTableEvents(ctx context.Context, eventid *int, ticker *st
 			&user.CreatedAt,
 			&user.Ticker,
 			&user.ImageURL,
+			&user.Title,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("unable to scan row: %w", err)

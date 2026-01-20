@@ -39,7 +39,7 @@ func FetchAndStoreTags(ctx context.Context, db storage.DBManager, slug string) e
 }
 
 // compares events from polymarket API to those in our db. Inserts new events, deletes closed/nonexistent events
-func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []int, deleted []int, err error) {
+func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string, deleted []string, err error) {
 	// might add parameters e.g. eventid, tagids, etc later
 	// get all tracked tags from db
 	tableTags, err := db.GetTrackedTags(ctx)
@@ -99,8 +99,8 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []int, d
 				break
 			}
 		}
-		if !found {
-			inserted = append(inserted, apiEvent.EventID)
+		if !found && apiEvent.Title != nil {
+			inserted = append(inserted, *apiEvent.Title)
 			notInDb = append(notInDb, apiEvent)
 		}
 	}
@@ -118,8 +118,8 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []int, d
 				break
 			}
 		}
-		if !found {
-			deleted = append(deleted, dbEvent.EventID)
+		if !found && dbEvent.Title != nil {
+			deleted = append(deleted, *dbEvent.Title)
 			err = db.DeleteEvent(ctx, dbEvent.EventID)
 			if err != nil {
 				return nil, nil, err
