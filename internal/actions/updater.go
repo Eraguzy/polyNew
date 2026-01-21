@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"strconv"
 
 	"github.com/Eraguzy/PolyNew/internal/storage"
@@ -128,5 +129,20 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string
 	}
 
 	// notify telegram (TODO)
+	args := []messenger.GetArgs{
+		{Param: messenger.URLParamText, Value: "testooor"},
+		{Param: messenger.URLParamChatID, Value: os.Getenv("TELEGRAM_CHANNEL_TAG")},
+	}
+	_, err = messenger.SendGetRequest(
+		messenger.URLTelegramBotAPI,
+		messenger.TelegramBotPathBuilder(
+			os.Getenv("TELEGRAM_BOT_TOKEN"),
+			messenger.PathSendMessage,
+		),
+		args,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
 	return inserted, deleted, nil
 }

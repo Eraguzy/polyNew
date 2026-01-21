@@ -19,6 +19,7 @@ func SendGetRequest(url URL, route URLPath, args []GetArgs) ([]byte, error) {
 			urlString += fmt.Sprintf("%s=%s", arg.Param, arg.Value)
 		}
 	}
+	fmt.Println(urlString)
 	resp, err := http.Get(urlString)
 	if err != nil {
 		return nil, err
