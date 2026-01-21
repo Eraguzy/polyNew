@@ -6,21 +6,21 @@ import (
 	"strconv"
 
 	"github.com/Eraguzy/PolyNew/internal/storage"
-	"github.com/Eraguzy/PolyNew/messager/polymarket"
+	"github.com/Eraguzy/PolyNew/messenger"
 )
 
 // if found in polymarket's api, insert/update in db
 func FetchAndStoreTags(ctx context.Context, db storage.DBManager, slug string) error {
-	body, err := polymarket.SendGetRequest(
-		polymarket.URLGammaAPI,
-		polymarket.PathTagsSlug(slug),
+	body, err := messenger.SendGetRequest(
+		messenger.URLGammaAPI,
+		messenger.PathTagsSlug(slug),
 		nil,
 	)
 	if err != nil {
 		return err
 	}
 
-	tag := polymarket.Tag{}
+	tag := messenger.Tag{}
 	err = json.Unmarshal(body, &tag)
 	if err != nil {
 		return err
@@ -54,23 +54,23 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string
 			continue
 		}
 
-		args := []polymarket.GetArgs{
-			{Param: polymarket.URLParamActive, Value: "true"},
-			{Param: polymarket.URLParamClosed, Value: "false"},
-			{Param: polymarket.URLParamLimit, Value: "500"},
-			{Param: polymarket.URLParamTagID, Value: strconv.Itoa(tag.TagID)},
-			// {Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)}, // required if api response is too long
+		args := []messenger.GetArgs{
+			{Param: messenger.URLParamActive, Value: "true"},
+			{Param: messenger.URLParamClosed, Value: "false"},
+			{Param: messenger.URLParamLimit, Value: "500"},
+			{Param: messenger.URLParamTagID, Value: strconv.Itoa(tag.TagID)},
+			// {Param: messenger.URLParamOffset, Value: fmt.Sprintf("%d", offset)}, // required if api response is too long
 		}
-		body, err := polymarket.SendGetRequest(
-			polymarket.URLGammaAPI,
-			polymarket.PathEvents,
+		body, err := messenger.SendGetRequest(
+			messenger.URLGammaAPI,
+			messenger.PathEvents,
 			args,
 		)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		events := []polymarket.Event{}
+		events := []messenger.Event{}
 		err = json.Unmarshal(body, &events)
 		if err != nil {
 			return nil, nil, err
