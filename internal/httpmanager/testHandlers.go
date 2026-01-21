@@ -18,6 +18,7 @@ func HandlerGetRoot(w http.ResponseWriter, r *http.Request) {
 		hasSecond, second,
 	))
 }
-func HandlerGetHello(w http.ResponseWriter, r *http.Request) {
-	io.WriteString(w, "/hello received\n")
+func HandlerKeepAlive(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	io.WriteString(w, "i'm alive for free :)\n")
 }

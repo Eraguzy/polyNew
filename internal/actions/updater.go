@@ -196,6 +196,7 @@ func notifyTelegramChannel(message string, disableNotif bool) ([]byte, error) {
 		{Param: messenger.URLDisableNotif, Value: strconv.FormatBool(disableNotif)},
 		{Param: messenger.URLParamText, Value: message},
 		{Param: messenger.URLParseMode, Value: "Markdown"},
+		{Param: messenger.URLParamLinkPreviewOptions, Value: `{"is_disabled":true}`},
 		{Param: messenger.URLParamChatID, Value: os.Getenv("TELEGRAM_CHANNEL_TAG")},
 	}
 	response, err := messenger.SendPostRequest(
