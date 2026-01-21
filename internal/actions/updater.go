@@ -38,7 +38,7 @@ func FetchAndStoreTags(ctx context.Context, db storage.DBManager, slug string) e
 		return err
 	}
 
-	err = notifyCurrentTags(ctx, db)
+	err = NotifyCurrentTags(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func SetTrackedTag(ctx context.Context, db storage.DBManager, tagID int, tracked
 		return err
 	}
 
-	err = notifyCurrentTags(ctx, db)
+	err = NotifyCurrentTags(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string
 	return inserted, deleted, nil
 }
 
-func notifyCurrentTags(ctx context.Context, db storage.DBManager) error {
+func NotifyCurrentTags(ctx context.Context, db storage.DBManager) error {
 	tags, err := db.GetTrackedTags(ctx)
 	if err != nil {
 		return fmt.Errorf("error while getting tag by ID : %v", err)
