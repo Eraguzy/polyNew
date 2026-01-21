@@ -9,21 +9,21 @@ import (
 )
 
 // stores all the tags from polymarket API (/tags)
-type TableTags struct {
+type TableTag struct {
 	TagID   int    `db:"tagID"`
 	Name    string `db:"name"`
 	Tracked bool   `db:"tracked"` // whether we are tracking this tag or not
 }
 
-func (t TableTags) TableName() string {
+func (t TableTag) TableName() string {
 	return `"tbPolymarketTags"`
 }
 
-func (t TableTags) TableNameIdentifier() string {
+func (t TableTag) TableNameIdentifier() string {
 	return "tbPolymarketTags"
 }
 
-func (db DBManager) UpdateTag(ctx context.Context, tableTag TableTags) error {
+func (db DBManager) UpdateTag(ctx context.Context, tableTag TableTag) error {
 	req := fmt.Sprintf(`
         UPDATE %s
         SET name = @name,
@@ -42,7 +42,7 @@ func (db DBManager) SetTrackedTag(ctx context.Context, tagID int, tracked bool) 
 	req := fmt.Sprintf(`
         UPDATE %s
         SET tracked = @tracked 
-		WHERE "tagID" = @tagID`, TableTags{}.TableName())
+		WHERE "tagID" = @tagID`, TableTag{}.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"tagID":   tagID,
@@ -51,7 +51,7 @@ func (db DBManager) SetTrackedTag(ctx context.Context, tagID int, tracked bool) 
 	return err
 }
 
-func (db DBManager) InsertTag(ctx context.Context, tableTag TableTags) error {
+func (db DBManager) InsertTag(ctx context.Context, tableTag TableTag) error {
 	req := fmt.Sprintf(`INSERT INTO %s 
 	("tagID", name, tracked) VALUES 
 	(@tagID, @name, @tracked)`, tableTag.TableName())
@@ -64,12 +64,12 @@ func (db DBManager) InsertTag(ctx context.Context, tableTag TableTags) error {
 	return err
 }
 
-func (db DBManager) BulkInsertTags(ctx context.Context, tableTags []TableTags) error {
+func (db DBManager) BulkInsertTags(ctx context.Context, tableTags []TableTag) error {
 	columns := []string{"tagID", "name", "tracked"}
 
 	_, err := db.Pool.CopyFrom(
 		ctx,
-		pgx.Identifier{TableTags{}.TableNameIdentifier()},
+		pgx.Identifier{TableTag{}.TableNameIdentifier()},
 		columns,
 		pgx.CopyFromSlice(len(tableTags), func(i int) ([]any, error) {
 			return []any{
@@ -81,17 +81,17 @@ func (db DBManager) BulkInsertTags(ctx context.Context, tableTags []TableTags) e
 	)
 
 	if err != nil {
-		return fmt.Errorf("couldn't bulk insert into %s table: %w", TableTags{}.TableName(), err)
+		return fmt.Errorf("couldn't bulk insert into %s table: %w", TableTag{}.TableName(), err)
 	}
 
 	return nil
 }
 
-func (db DBManager) GetTableTags(ctx context.Context, tagID *int, name *string) ([]TableTags, error) {
+func (db DBManager) GetTableTags(ctx context.Context, tagID *int, name *string) ([]TableTag, error) {
 	// build query
 	conditions := []string{}
 	args := []any{}
-	req := fmt.Sprintf("SELECT * FROM %s", TableTags{}.TableName())
+	req := fmt.Sprintf("SELECT * FROM %s", TableTag{}.TableName())
 
 	if tagID != nil {
 		args = append(args, *tagID)
@@ -111,9 +111,9 @@ func (db DBManager) GetTableTags(ctx context.Context, tagID *int, name *string) 
 	}
 	defer rows.Close()
 
-	output := []TableTags{}
+	output := []TableTag{}
 	for rows.Next() {
-		user := TableTags{}
+		user := TableTag{}
 		err := rows.Scan(
 			&user.TagID,
 			&user.Name,
@@ -127,19 +127,19 @@ func (db DBManager) GetTableTags(ctx context.Context, tagID *int, name *string) 
 	return output, nil
 }
 
-func (db DBManager) GetTrackedTags(ctx context.Context) ([]TableTags, error) {
-	req := fmt.Sprintf("SELECT * FROM %s WHERE tracked = TRUE", TableTags{}.TableName())
+func (db DBManager) GetTrackedTags(ctx context.Context) ([]TableTag, error) {
+	req := fmt.Sprintf("SELECT * FROM %s WHERE tracked = TRUE", TableTag{}.TableName())
 	rows, err := db.Pool.Query(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	return pgx.CollectRows(rows, pgx.RowToStructByName[TableTags])
+	return pgx.CollectRows(rows, pgx.RowToStructByName[TableTag])
 }
 
 func (db DBManager) DeleteTag(ctx context.Context, tagID int) error {
-	req := fmt.Sprintf(`DELETE FROM %s WHERE "TagID" = @TagID`, TableTags{}.TableName())
+	req := fmt.Sprintf(`DELETE FROM %s WHERE "TagID" = @TagID`, TableTag{}.TableName())
 
 	_, err := db.Pool.Exec(ctx, req, pgx.NamedArgs{
 		"tagID": tagID,

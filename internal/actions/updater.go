@@ -3,6 +3,8 @@ package actions
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net/url"
 	"os"
 	"strconv"
 
@@ -30,12 +32,28 @@ func FetchAndStoreTags(ctx context.Context, db storage.DBManager, slug string) e
 	if err != nil {
 		return err
 	}
-
 	err = db.InsertTag(ctx, tabletag)
 	if err != nil {
 		return err
 	}
 
+	err = notifyCurrentTags(ctx, db)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetTrackedTag(ctx context.Context, db storage.DBManager, tagID int, tracked bool) error {
+	err := db.SetTrackedTag(ctx, tagID, tracked)
+	if err != nil {
+		return err
+	}
+
+	err = notifyCurrentTags(ctx, db)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -128,12 +146,59 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string
 		}
 	}
 
-	// notify telegram (TODO)
+	if len(inserted) == 1 {
+		_, err = notifyTelegramChannel("New event found : '"+inserted[0]+"'", true)
+		if err != nil {
+			return nil, nil, err
+		}
+	} else if len(inserted) > 1 {
+		message := "New events found : \n"
+		for _, title := range inserted {
+			link := "[" + title + "](https://polymarket.com/search?_q=" + url.QueryEscape(title) + ")"
+
+			if len(message+"- "+link+"\n") > 3000 { // avoid 400 error from telegram api
+				_, err = notifyTelegramChannel(message, true)
+				if err != nil {
+					return nil, nil, err
+				}
+				message = ""
+			}
+			message += "- " + link + "\n"
+		}
+		_, err = notifyTelegramChannel(message, true)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return inserted, deleted, nil
+}
+
+func notifyCurrentTags(ctx context.Context, db storage.DBManager) error {
+	tags, err := db.GetTrackedTags(ctx)
+	if err != nil {
+		return fmt.Errorf("error while getting tag by ID : %v", err)
+	}
+	output := "List updated. Now tracking : \n"
+	for _, tag := range tags {
+		output += fmt.Sprintf("(%d) %s\n", tag.TagID, tag.Name)
+	}
+
+	_, err = notifyTelegramChannel(output, false)
+	if err != nil {
+		return fmt.Errorf("error while notifying telegram channel : %v", err)
+	}
+	return nil
+}
+
+func notifyTelegramChannel(message string, disableNotif bool) ([]byte, error) {
 	args := []messenger.GetArgs{
-		{Param: messenger.URLParamText, Value: "testooor"},
+		{Param: messenger.URLDisableNotif, Value: strconv.FormatBool(disableNotif)},
+		{Param: messenger.URLParamText, Value: message},
+		{Param: messenger.URLParseMode, Value: "Markdown"},
 		{Param: messenger.URLParamChatID, Value: os.Getenv("TELEGRAM_CHANNEL_TAG")},
 	}
-	_, err = messenger.SendGetRequest(
+	response, err := messenger.SendPostRequest(
 		messenger.URLTelegramBotAPI,
 		messenger.TelegramBotPathBuilder(
 			os.Getenv("TELEGRAM_BOT_TOKEN"),
@@ -141,8 +206,5 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string
 		),
 		args,
 	)
-	if err != nil {
-		return nil, nil, err
-	}
-	return inserted, deleted, nil
+	return response, err
 }

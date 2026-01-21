@@ -15,8 +15,8 @@ func (db DBHandler) HandlerSetTrackedTag(w http.ResponseWriter, r *http.Request)
 		io.WriteString(w, "'tracked' param is required\n")
 		return
 	}
-	if !r.URL.Query().Has("TagID") {
-		io.WriteString(w, "'TagID' param is required\n")
+	if !r.URL.Query().Has("tagID") {
+		io.WriteString(w, "'tagID' param is required\n")
 		return
 	}
 	tracked, err := strconv.ParseBool(r.URL.Query().Get("tracked"))
@@ -24,13 +24,13 @@ func (db DBHandler) HandlerSetTrackedTag(w http.ResponseWriter, r *http.Request)
 		io.WriteString(w, fmt.Sprintf("error while parsing 'tracked' param: %v\n", err))
 		return
 	}
-	TagID, err := strconv.Atoi(r.URL.Query().Get("TagID"))
+	tagID, err := strconv.Atoi(r.URL.Query().Get("tagID"))
 	if err != nil {
-		io.WriteString(w, fmt.Sprintf("error while parsing 'TagID' param: %v\n", err))
+		io.WriteString(w, fmt.Sprintf("error while parsing 'tagID' param: %v\n", err))
 		return
 	}
 
-	err = db.Db.SetTrackedTag(r.Context(), TagID, tracked)
+	err = actions.SetTrackedTag(r.Context(), db.Db, tagID, tracked)
 	if err != nil {
 		io.WriteString(w, fmt.Sprintf("error while setting tag's tracked value : %v\n", err))
 		return
@@ -49,7 +49,7 @@ func (db DBHandler) HandlerCompareEvents(w http.ResponseWriter, r *http.Request)
 
 func (db DBHandler) HandlerFetchStoreTag(w http.ResponseWriter, r *http.Request) {
 	if !r.URL.Query().Has("slug") {
-		io.WriteString(w, "'tracked' slug is required\n")
+		io.WriteString(w, "'slug' param is required\n")
 		return
 	}
 	err := actions.FetchAndStoreTags(r.Context(), db.Db, r.URL.Query().Get("slug"))
