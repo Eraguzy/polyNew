@@ -4,7 +4,7 @@ import "net/http"
 
 func TestRoutes(mux *http.ServeMux) *http.ServeMux {
 	mux.HandleFunc("/", HandlerGetRoot)
-	mux.HandleFunc("/hello", HandlerGetHello)
+	mux.HandleFunc("/keepalive", HandlerKeepAlive)
 
 	return mux
 }
