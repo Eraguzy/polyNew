@@ -40,16 +40,16 @@ func main() {
 
 //  limit := 500
 //  for offset := 0; ; offset += 500 {
-//  	args := []polymarket.GetArgs{
-//  		{Param: polymarket.URLParamActive, Value: "true"},
-//  		{Param: polymarket.URLParamClosed, Value: "false"},
-//  		{Param: polymarket.URLParamLimit, Value: fmt.Sprintf("%d", limit)},
-//  		{Param: polymarket.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
+//  	args := []messenger.GetArgs{
+//  		{Param: messenger.URLParamActive, Value: "true"},
+//  		{Param: messenger.URLParamClosed, Value: "false"},
+//  		{Param: messenger.URLParamLimit, Value: fmt.Sprintf("%d", limit)},
+//  		{Param: messenger.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
 //  	}
 
-//  	body, err := polymarket.SendGetRequest(
-//  		polymarket.URLGammaAPI,
-//  		polymarket.PathEvents,
+//  	body, err := messenger.SendGetRequest(
+//  		messenger.URLGammaAPI,
+//  		messenger.PathEvents,
 //  		args,
 //  	)
 //  	if err != nil {

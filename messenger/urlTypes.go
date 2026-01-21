@@ -1,4 +1,4 @@
-package polymarket
+package messenger
 
 type GetArgs struct {
 	Param URLParam
@@ -8,7 +8,7 @@ type GetArgs struct {
 type URL string
 
 const (
-	URLGammaAPI URL = "https://gamma-api.polymarket.com"
+	URLGammaAPI URL = "https://gamma-api.messenger.com"
 )
 
 type URLPath string
