@@ -43,6 +43,8 @@ const (
 	URLParamTagID  URLParam = "tag_id"
 	URLParamSlug   URLParam = "slug"
 	// telegram
-	URLParamChatID URLParam = "chat_id"
-	URLParamText   URLParam = "text"
+	URLParamChatID  URLParam = "chat_id"
+	URLParamText    URLParam = "text"
+	URLParseMode    URLParam = "parse_mode"
+	URLDisableNotif URLParam = "disable_notification"
 )

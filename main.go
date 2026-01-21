@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Eraguzy/PolyNew/httpmanager"
+	"github.com/Eraguzy/PolyNew/internal/httpmanager"
 	"github.com/Eraguzy/PolyNew/internal/storage"
 	"github.com/joho/godotenv"
 )
@@ -37,32 +37,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-//  limit := 500
-//  for offset := 0; ; offset += 500 {
-//  	args := []messenger.GetArgs{
-//  		{Param: messenger.URLParamActive, Value: "true"},
-//  		{Param: messenger.URLParamClosed, Value: "false"},
-//  		{Param: messenger.URLParamLimit, Value: fmt.Sprintf("%d", limit)},
-//  		{Param: messenger.URLParamOffset, Value: fmt.Sprintf("%d", offset)},
-//  	}
-
-//  	body, err := messenger.SendGetRequest(
-//  		messenger.URLGammaAPI,
-//  		messenger.PathEvents,
-//  		args,
-//  	)
-//  	if err != nil {
-//  		fmt.Println("error:", err)
-//  		break
-//  	}
-
-//  	fmt.Println(string(body))
-//  	fmt.Println("offset:", offset)
-
-//  	if string(body) == "[]" {
-//  		fmt.Println("done")
-//  		break
-//  	}
-//  }
-//

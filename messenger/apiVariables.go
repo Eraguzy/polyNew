@@ -18,12 +18,12 @@ type Tag struct {
 	RequiresTranslation bool      `json:"requiresTranslation"`
 }
 
-func (s Tag) ToTableTag() (storage.TableTags, error) {
+func (s Tag) ToTableTag() (storage.TableTag, error) {
 	strid, err := strconv.Atoi(s.ID)
 	if err != nil {
-		return storage.TableTags{}, err
+		return storage.TableTag{}, err
 	}
-	return storage.TableTags{
+	return storage.TableTag{
 		TagID:   strid,
 		Name:    s.Label,
 		Tracked: true, // default to false, can be updated later
