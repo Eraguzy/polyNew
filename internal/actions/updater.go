@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/Eraguzy/PolyNew/internal/storage"
 	"github.com/Eraguzy/PolyNew/messenger"
@@ -208,4 +209,24 @@ func notifyTelegramChannel(message string, disableNotif bool) ([]byte, error) {
 		args,
 	)
 	return response, err
+}
+
+func Polling(ctx context.Context, db storage.DBManager) error {
+	ticker := time.NewTicker(15 * time.Second)
+	go func() {
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				_, _, err := CompareEvents(ctx, db)
+				if err != nil {
+					fmt.Printf("error during polling: %v\n", err)
+				}
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	return nil
 }
