@@ -20,5 +20,6 @@ func HandlerGetRoot(w http.ResponseWriter, r *http.Request) {
 }
 func HandlerKeepAlive(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	fmt.Println("keepalive triggered.")
 	io.WriteString(w, "i'm alive for free :)\n")
 }
