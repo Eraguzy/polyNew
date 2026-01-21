@@ -54,7 +54,7 @@ func (db DBHandler) HandlerFetchStoreTag(w http.ResponseWriter, r *http.Request)
 	}
 	err := actions.FetchAndStoreTags(r.Context(), db.Db, r.URL.Query().Get("slug"))
 	if err != nil {
-		io.WriteString(w, fmt.Sprintf("error during fetching/storing tag: %v\n", err))
+		io.WriteString(w, fmt.Sprintf("error while fetching/storing tag: %v\n", err))
 		return
 	}
 	io.WriteString(
@@ -63,4 +63,12 @@ func (db DBHandler) HandlerFetchStoreTag(w http.ResponseWriter, r *http.Request)
 			r.URL.Query().Get("slug"),
 		),
 	)
+}
+
+func (db DBHandler) HandlerNotifyTrackedTags(w http.ResponseWriter, r *http.Request) {
+	err := actions.NotifyCurrentTags(r.Context(), db.Db)
+	if err != nil {
+		io.WriteString(w, fmt.Sprintf("error while notifying tracked tags: %v\n", err))
+		return
+	}
 }
