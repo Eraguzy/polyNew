@@ -148,7 +148,8 @@ func CompareEvents(ctx context.Context, db storage.DBManager) (inserted []string
 	}
 
 	if len(inserted) == 1 {
-		_, err = notifyTelegramChannel("New event found : '"+inserted[0]+"'", true)
+		link := "[" + inserted[0] + "](https://polymarket.com/search?_q=" + url.QueryEscape(inserted[0]) + ")"
+		_, err = notifyTelegramChannel("New event found : "+link, true)
 		if err != nil {
 			return nil, nil, err
 		}
