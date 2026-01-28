@@ -7,15 +7,18 @@ PM [@eragyoza](https://t.me/eragoza) for requests.
 ## API
 An HTTP server is listening on Koyeb [here](https://sophisticated-aloisia-isabellesdesk-6e0ebfef.koyeb.app/).
 
-Endpoints :
+Endpoints : all GET requests
 
-`/fetch-store-tag` => Get a tag by its slug and store it. By default the tag will be set as tracked.
+- `/actions/fetch-store-tag` => Get a tag by its slug and store it. By default, the tag will be set as tracked.
+    - `slug` (string) : the tag identifier. Won't be inserted if not found in Polymarket API.
 
-`/set-tracked-tag` => Set a stored tag as tracked/not tracked. If tracked, new events related to the tag will be outputted by `/compare-events`
+- `/actions/set-tracked-tag` => Set a stored tag as tracked/not tracked. If tracked, new events related to the tag will be outputted by `/actions/compare-events`.
+    - `tagID` (int) : the stored tag id.
+    - `tracked` (bool) : the value to set to the tag.
 
-`/notify-tracked-tags` => Triggers an alert displaying tracked tags.
+- `/actions/notify-tracked-tags` => Triggers an alert displaying tracked tags.
 
-`/compare-events` => Compares events to detect new items, and sends a Telegram alert if new events are detected. A goroutine constantly calls the function associated to this route to refresh events when the server is up.
+- `/actions/compare-events` => Compares events to detect new items, and sends a Telegram alert if new events are detected. A goroutine constantly calls the function associated to this route to refresh events when the server is up.
 
 ## Services
 Uses Supabase (Postgres) to host the DB.
