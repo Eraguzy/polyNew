@@ -212,7 +212,8 @@ func notifyTelegramChannel(message string, disableNotif bool) ([]byte, error) {
 	return response, err
 }
 
-func Polling(ctx context.Context, db storage.DBManager) error {
+// goroutine to poll polymarket's api
+func Polling(ctx context.Context, db storage.DBManager) {
 	ticker := time.NewTicker(15 * time.Second)
 	go func() {
 		defer ticker.Stop()
@@ -228,6 +229,4 @@ func Polling(ctx context.Context, db storage.DBManager) error {
 			}
 		}
 	}()
-
-	return nil
 }
