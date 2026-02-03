@@ -2,7 +2,7 @@
 
 This repository is the backend behind this [Telegram channel](https://t.me/isapolynew), which consists of a feed of notifications for new events having the selected tags on Polymarket.
 
-PM [@eragyoza](https://t.me/eragoza) for requests.
+PM [@eragyoza](https://t.me/eragyoza) for requests.
 
 ## API
 An HTTP server is listening on Koyeb [here](https://sophisticated-aloisia-isabellesdesk-6e0ebfef.koyeb.app/).
