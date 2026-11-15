@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -19,11 +20,15 @@ func main() {
 	// open db connection
 	db, err := storage.ConnectToDB()
 	if err != nil {
-		fmt.Printf("error connecting to db: %s\n", err)
-		os.Exit(1)
+		log.Fatalf("error connecting to db: %s", err)
 	}
 
 	// setup http server with routes
+	var user = os.Getenv("BASICAUTH_USER")
+	var pass = os.Getenv("BASICAUTH_PASS")
+	if user == "" || pass == "" {
+		log.Fatal("BASICAUTH_USER or BASICAUTH_PASS not set")
+	}
 	mux := http.NewServeMux()
 	mux = httpmanager.TestRoutes(mux)
 	mux = httpmanager.UpdaterRoutes(
@@ -31,6 +36,8 @@ func main() {
 		httpmanager.DBHandler{
 			Db: storage.DBManager{Pool: db},
 		},
+		user,
+		pass,
 	)
 
 	// self polling
@@ -43,7 +50,6 @@ func main() {
 	if errors.Is(err, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
 	} else if err != nil {
-		fmt.Printf("error when starting server: %s\n", err)
-		os.Exit(1)
+		log.Fatalf("error when starting server: %s", err)
 	}
 }
