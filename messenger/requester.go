@@ -1,6 +1,7 @@
 package messenger
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -42,6 +43,14 @@ func SendPostRequest(urlBase URL, route URLPath, args []GetArgs) ([]byte, error)
 
 	resp, err := http.PostForm(endpoint, form)
 	if err != nil {
+		// keep only scheme/host, rest of url can hold a secret e.g. telegram
+		if uerr, ok := errors.AsType[*url.Error](err); ok {
+			if u, perr := url.Parse(endpoint); perr == nil {
+				uerr.URL = u.Scheme + "://" + u.Host
+			} else {
+				uerr.URL = "<redacted>"
+			}
+		}
 		return nil, err
 	}
 	defer resp.Body.Close()
